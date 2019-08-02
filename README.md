@@ -1,6 +1,13 @@
 # network-banking
 this is my academics project.
-this project is completely written in c++ language.
-this is a network banking web-application. in which bank having the full control over the software and user also having some rights.
-bank create, modify, delete the account. bank can withdraw, credit, debit the money. 
-on other hand user only withdraw, debit, transfer the money.
+
+# Language
+  C++
+  Graphics With C++
+  Database
+
+# Description
+this is a network banking web-application. In which bank having the full control over the User accounts and other facilities.
+Bank can create, modify, delete the customer account and maintain the accounts statements and the logs.
+
+and user can withdraw , deposit and transfer the money.
