@@ -13,10 +13,10 @@ and user can withdraw , deposit and transfer the money.
 
 #installation
 software requirement:
-  1.IDE
-  2.c language compiler
+  1.IDE</br>
+  2.c language compiler</br></br>
 
-how to run project:
+how to run project:</br>
 step 1. setup your IDE Environment.
 step 2. open the project file with .cpp extension in IDE.
 step 3. compile the file.
