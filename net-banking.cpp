@@ -798,4 +798,1101 @@ void initial :: box_for_list()
 	gotoxy(4,2) ;
 	cout <<"Date: " <<d1 <<"/" <<m1 <<"/" <<y1 ;
 }
+//**********************************************************************
 
+// CLASS INITIAL :: THIS FUNCTION DISPLAYS THE LIST OF ACCOUNTS IN FILE
+// 		    INITIAL.DAT
+//**********************************************************************
+
+
+void initial :: display_list(void)
+{
+	clrscr() ;
+	box_for_list() ;
+	int row=6, flag ;
+	fstream file ;
+	file.open("INITIAL.DAT", ios::in|ios::binary) ;
+	while (file.read((char *) this, sizeof(initial)))
+	{
+		flag = 0 ;
+		delay(10) ;
+		gotoxy(7,row) ;
+		cout <<accno ;
+		gotoxy(25,row) ;
+		cout <<name ;
+		gotoxy(57,row) ;
+		cout <<balance ;
+		row++ ;
+		if (row == 23)
+		{
+			flag = 1 ;
+			row = 6 ;
+			gotoxy(4,24) ;
+			cout <<"Press any key to continue..." ;
+			getch() ;
+			clrscr() ;
+			box_for_list() ;
+		}
+	}
+	file.close() ;
+	if (!flag)
+	{
+		gotoxy(4,24) ;
+		cout <<"Press any key to continue..." ;
+		getch() ;
+	}
+}
+
+
+//*****************************************************************
+// CLASS INITIAL :: THIS FUNCTION ADDS THE GIVEN DATA INTO THE FILE
+//		    INITIAL.DAT
+//*****************************************************************
+
+void initial :: add_to_file(int t_accno, char t_name[30], char
+t_address[60], float t_balance)
+{
+	accno = t_accno ;
+	strcpy(name,t_name) ;
+	strcpy(address,t_address) ;
+	balance = t_balance ;
+	fstream file ;
+	file.open("INITIAL.DAT", ios::out | ios::app|ios::binary) ;
+	file.write((char *) this, sizeof(initial)) ;
+	file.close() ;
+}
+
+
+//***********************************************************************
+
+// CLASS INITIAL :: THIS FUNCTION DELETES RECORD FOR THE GIVEN ACOUNT NO.
+// 		    FROM THE FILE INITIAL.DAT
+//***********************************************************************
+
+
+void initial :: delete_account(int t_accno)
+{
+	fstream file ;
+	file.open("INITIAL.DAT", ios::in|ios::binary) ;
+	fstream temp ;
+	temp.open("temp.dat", ios::out|ios::binary) ;
+	file.seekg(0,ios::beg) ;
+	while ( !file.eof() )
+	{
+		file.read((char *) this, sizeof(initial)) ;
+		if ( file.eof() )
+			break ;
+		if ( accno != t_accno )
+			temp.write((char *) this, sizeof(initial)) ;
+	}
+	file.close() ;
+	temp.close() ;
+	file.open("INITIAL.DAT", ios::out|ios::binary) ;
+	temp.open("temp.dat", ios::in|ios::binary) ;
+	temp.seekg(0,ios::beg) ;
+	while ( !temp.eof() )
+	{
+		temp.read((char *) this, sizeof(initial)) ;
+		if ( temp.eof() )
+			break ;
+		file.write((char *) this, sizeof(initial)) ;
+	}
+	file.close() ;
+	temp.close() ;
+}
+
+
+//************************************************************************
+
+// CLASS INITIAL :: THIS FUNCTION UPDATE BALANCE FOR THE GIVEN ACOUNT NO.
+// 		    IN THE FILE INITIAL.DAT
+//************************************************************************
+
+
+void initial :: update_balance(int t_accno, float t_balance)
+{
+	int recno ;
+	recno = recordno(t_accno) ;
+	fstream file ;
+	file.open("INITIAL.DAT", ios::out | ios::ate|ios::binary) ;
+	balance = t_balance ;
+	int location ;
+	location = (recno-1) * sizeof(initial) ;
+	file.seekp(location) ;
+	file.write((char *) this, sizeof(initial)) ;
+	file.close() ;
+}
+
+
+//**********************************************************************
+
+// CLASS INITIAL :: THIS FUNCTION MODIFIES THE RECORD FOR THE GIVEN DATA
+// 		    IN THE FILE INITIAL.DAT
+//**********************************************************************
+
+
+void initial :: modify_account(int t_accno, char t_name[30], char
+t_address[60])
+{
+	int recno ;
+	recno = recordno(t_accno) ;
+	fstream file ;
+	file.open("INITIAL.DAT", ios::out | ios::ate|ios::binary) ;
+	strcpy(name,t_name) ;
+	strcpy(address,t_address) ;
+	int location ;
+	location = (recno-1) * sizeof(initial) ;
+	file.seekp(location) ;
+	file.write((char *) this, sizeof(initial)) ;
+	file.close() ;
+}
+
+
+//************************************************************************
+
+//CLASS INITIAL :: THIS FUNCTION GIVE THE DATA TO MODIFY THE RECORD IN THE
+//		   FILE INITIAL.DAT
+//************************************************************************
+
+
+void initial :: modify(void)
+{
+	clrscr() ;
+	char t_acc[10] ;
+	int t, t_accno ;
+	gotoxy(1,1) ;
+	cout <<"PRESS (0) TO EXIT" ;
+	gotoxy(5,5) ;
+	cout <<"Enter the account no. " ;
+	gets(t_acc) ;
+	t = atoi(t_acc) ;
+	t_accno = t ;
+	if (t_accno == 0)
+		return ;
+	clrscr() ;
+	if (!found_account(t_accno))
+	{
+		gotoxy(5,5) ;
+		cout <<"\7Account not found" ;
+		getch() ;
+		return ;
+	}
+	shape s ;
+	s.box(2,2,79,24,218) ;
+	s.line_hor(3,78,4,196) ;
+	s.line_hor(3,78,22,196) ;
+	gotoxy(1,1) ;
+	cout <<"PRESS (0) TO EXIT" ;
+	textbackground(WHITE) ;
+	gotoxy(3,3) ;
+	for (int i=1; i<=76; i++) cprintf(" ") ;
+	textbackground(BLACK) ;
+	textcolor(BLACK+BLINK) ; textbackground(WHITE) ;
+	gotoxy(30,3) ;
+	cprintf("MODIFY ACCOUNT SCREEN") ;
+	textcolor(LIGHTGRAY) ; textbackground(BLACK) ;
+	int d1, m1, y1 ;
+	struct date d;
+	getdate(&d);           		//Inbuilt function to display current
+	d1 = d.da_day ;			//date of the system
+	m1 = d.da_mon ;
+	y1 = d.da_year ;
+	gotoxy(62,5) ;
+	cout <<"Date: "<<d1
+<<"/" <<m1 <<"/" <<y1 ;
+	char ch ;
+	display(t_accno) ;
+	account a ;
+	do
+	{
+		a.clear(5,13) ;
+		gotoxy(5,13) ;
+		cout <<"Modify this account (y/n): " ;
+		ch = getche() ;
+		if (ch == '0')
+			return ;
+		ch = toupper(ch) ;
+	} while (ch != 'N' && ch != 'Y') ;
+	if (ch == 'N')
+		return ;
+	int modified=0, valid ;
+	char t_name[30], t_address[60] ;
+	gotoxy(5,15) ;
+	cout <<"Name    : " ;
+	gotoxy(5,16) ;
+	cout <<"Address : " ;
+	do
+	{
+		a.clear(15,15) ;
+		a.clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER NAME or PRESS <ENTER> FOR NO CHANGE" ;
+		valid = 1 ;
+		gotoxy(15,15) ;
+		gets(t_name) ;
+		strupr(t_name) ;
+		if (t_name[0] == '0')
+			return ;
+		if (strlen(t_name) > 25)
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7NAME SHOULD NOT BE GREATER THAN 25") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	if (strlen(t_name) > 0)
+		modified = 1 ;
+	do
+	{
+		a.clear(15,16) ;
+		a.clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER ADDRESS or PRESS <ENTER> FOR NO CHANGE" ;
+		valid = 1;
+		gotoxy(15,16) ;
+		gets(t_address) ;
+		strupr(t_address) ;
+		if (t_address[0] == '0')
+			return ;
+		if (strlen(t_address) > 55)
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7SHOULD NOT BE BLANK OR GREATER THAN 55") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	if (strlen(t_address) > 0)
+		modified = 1 ;
+	if (!modified)
+		return ;
+	a.clear(5,23) ;
+	do
+	{
+		a.clear(5,18) ;
+		gotoxy(5,18) ;
+		cout <<"Do you want to save changes (y/n): " ;
+		ch = getche() ;
+		if (ch == '0')
+			return ;
+		ch = toupper(ch) ;
+	} while (ch != 'N' && ch != 'Y') ;
+	if (ch == 'N')
+		return ;
+	modify_account(t_accno,t_name,t_address) ;
+	gotoxy(5,21) ;
+	cout <<"\7Record Modified" ;
+	gotoxy(5,23) ;
+	cout <<"press a key to continue..." ;
+	getch() ;
+}
+
+
+//****************************************************************
+// CLASS ACCOUNT :: THIS FUNCTION CLEAR THE GIVEN ROW AND COLUMNS
+//****************************************************************
+
+void account :: clear(int col, int row)
+{
+	for (int i=col; i<=78; i++)
+	{
+		gotoxy(i,row) ;
+		cout <<" " ;
+	}
+}
+
+
+//*****************************************************************
+// CLASS ACCOUNT :: THIS FUNCTION ADDS THE GIVEN DATA INTO THE FILE
+//	            BANKING.DAT
+//*****************************************************************
+
+void account :: add_to_file(int t_accno, int d1, int m1, int y1, char
+t_tran, char t_type[10], float t_interest, float t_amount, float
+t_balance)
+{
+	fstream file ;
+	file.open("BANKING.DAT", ios::app|ios::binary) ;
+	accno = t_accno ;
+	dd = d1 ;
+	mm = m1 ;
+	yy = y1 ;
+	tran = t_tran ;
+	strcpy(type,t_type) ;
+	interest = t_interest ;
+	amount = t_amount ;
+	balance = t_balance ;
+	file.write((char *) this, sizeof(account)) ;
+	file.close() ;
+}
+
+
+//**************************************************************************
+
+// CLASS ACCOUNT :: THIS FUNCTION DELETES THE RECORD FOR GIVIN ACCOUNT NO.
+//		    FROM FILE BANKING.DAT
+//**************************************************************************
+
+
+void account :: delete_account(int t_accno)
+{
+	fstream file ;
+	file.open("BANKING.DAT", ios::in|ios::binary) ;
+	fstream temp ;
+	temp.open("temp.dat", ios::out|ios::binary) ;
+	file.seekg(0,ios::beg) ;
+	while ( !file.eof() )
+	{
+		file.read((char *) this, sizeof(account)) ;
+		if ( file.eof() )
+			break ;
+		if ( accno != t_accno )
+			temp.write((char *) this, sizeof(account)) ;
+	}
+	file.close() ;
+	temp.close() ;
+	file.open("BANKING.DAT", ios::out|ios::binary) ;
+	temp.open("temp.dat", ios::in|ios::binary) ;
+	temp.seekg(0,ios::beg) ;
+	while ( !temp.eof() )
+	{
+		temp.read((char *) this, sizeof(account)) ;
+		if ( temp.eof() )
+			break ;
+		file.write((char *) this, sizeof(account)) ;
+	}
+	file.close() ;
+	temp.close() ;
+}
+
+
+//**********************************************************
+// THIS FUNCTION ACCEPTS THE DATA TO ADD RECORDS IN THE
+// FILE BANKING.DAT
+//**********************************************************
+
+void account :: new_account(void)
+{
+	char ch ;
+	int i, valid ;
+	clrscr() ;
+	initial ini ;
+	shape s ;
+	s.box(2,2,79,24,218) ;
+	s.line_hor(3,78,4,196) ;
+	s.line_hor(3,78,22,196) ;
+	gotoxy(71,1) ;
+	cout <<"<0>=Exit" ;
+	textbackground(WHITE) ;
+	gotoxy(3,3) ;
+	for (i=1; i<=76; i++) cprintf(" ") ;
+	textbackground(BLACK) ;
+	textcolor(BLACK+BLINK) ; textbackground(WHITE) ;
+	gotoxy(32,3) ;
+	cprintf("OPEN NEW ACCOUNT") ;
+	textcolor(LIGHTGRAY) ; textbackground(BLACK) ;
+
+	int d1, m1, y1 ;
+	struct date d;
+	getdate(&d);
+	d1 = d.da_day ;
+	m1 = d.da_mon ;
+	y1 = d.da_year ;
+	int t_accno ;
+	t_accno = ini.last_accno() ;
+	t_accno++ ;
+	if (t_accno == 1)
+	{
+		ini.add_to_file(t_accno,"abc","xyz",1.1) ;
+		ini.delete_account(t_accno) ;
+		add_to_file(t_accno,1,1,1997,'D',"INITIAL",1.1,1.1,1.1) ;
+		delete_account(t_accno) ;
+	}
+	char t_name[30], t[10], t_address[60] ;
+	float t_bal=0.0, t_balance=0.0 ;
+
+	gotoxy(5,6) ;
+	cout <<"Date : "<<d1
+<<"/" <<m1 <<"/" <<y1 ;
+	gotoxy(5,8) ;
+	cout <<"Account no. # " <<t_accno ;
+	gotoxy(5,10) ;
+	cout <<"Name    : " ;
+	gotoxy(5,11) ;
+	cout <<"Address : " ;
+	gotoxy(5,12) ;
+	cout <<"Name of Verifying person : " ;
+	gotoxy(5,14) ;
+	cout <<"Initial Deposit : " ;
+	do
+	{
+		clear(15,10) ;
+		clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER NAME OF THE PERSON" ;
+		valid = 1 ;
+		gotoxy(15,10) ;
+		gets(t_name) ;
+		strupr(t_name) ;
+		if (t_name[0] == '0')
+			return ;
+		if (strlen(t_name) == 0 || strlen(t_name) > 25)
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7NAME SHOULD NOT BE BLANK OR GREATER THAN 25") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	do
+	{
+		clear(15,11) ;
+		clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER ADDRESS OF THE PERSON" ;
+		valid = 1 ;
+		gotoxy(15,11) ;
+		gets(t_address) ;
+		strupr(t_address) ;
+		if (t_address[0] == '0')
+			return ;
+		if (strlen(t_address) == 0 || strlen(t_address) > 55)
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7SHOULD NOT BLANK OR GREATER THAN 55") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	do
+	{
+		char vari[30] ;
+		clear(31,12) ;
+		clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER NAME OF THE VERIFING PERSON" ;
+		valid = 1 ;
+		gotoxy(31,12) ;
+		gets(vari) ;
+		strupr(vari) ;
+		if (vari[0] == '0')
+			return ;
+		if (strlen(vari) == 0 || strlen(vari) > 25)
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7SHOULD NOT BLANK OR GREATER THAN 25") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	do
+	{
+		clear(23,14) ;
+		clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER INITIAL AMOUNT TO BE DEPOSIT" ;
+		valid = 1 ;
+		gotoxy(23,14) ;
+		gets(t) ;
+		t_bal = atof(t) ;
+		t_balance = t_bal ;
+		if (t[0] == '0')
+			return ;
+		if (t_balance < 500)
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7SHOULD NOT LESS THAN 500          ") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	clear(5,23) ;
+	do
+	{
+		clear(5,17) ;
+		valid = 1 ;
+		gotoxy(5,17) ;
+		cout <<"Do you want to save the record (y/n) : " ;
+		ch = getche() ;
+		if (ch == '0')
+			return ;
+		ch = toupper(ch) ;
+	} while (ch != 'N' && ch != 'Y') ;
+	if (ch == 'N')
+		return ;
+	float t_amount, t_interest ;
+	t_amount = t_balance ;
+	t_interest = 0.0 ;
+	char t_tran, t_type[10] ;
+	t_tran = 'D' ;
+	strcpy(t_type,"INITIAL") ;
+	ini.add_to_file(t_accno,t_name,t_address,t_balance) ;
+       
+add_to_file(t_accno,d1,m1,y1,t_tran,t_type,t_interest,t_amount,t_balance)
+ ;
+}
+
+
+
+
+//**********************************************************
+// THIS FUNCTION DRAWS THE BOX FOR DISPLAYING RECORD FROM
+// FILE BANKING.DAT
+//**********************************************************
+
+void account :: box_for_display(int t_accno)
+{
+	shape s ;
+	s.box(2,1,79,25,218) ;
+	s.line_hor(3,78,4,196) ;
+	s.line_hor(3,78,6,196) ;
+	s.line_hor(3,78,23,196) ;
+	textbackground(WHITE) ;
+	gotoxy(3,5) ;
+	for (int i=1; i<=76; i++) cprintf(" ") ;
+	textbackground(BLACK) ;
+	textcolor(BLACK) ; textbackground(WHITE) ;
+	gotoxy(4,5) ;
+	cprintf("DATE	  PARTICULAR	DEPOSIT     WITHDRAW   INTEREST    BALANCE") ;
+	textcolor(LIGHTGRAY) ; textbackground(BLACK) ;
+	int d1, m1, y1 ;
+	struct date d;
+	getdate(&d);
+	d1 = d.da_day ;
+	m1 = d.da_mon ;
+	y1 = d.da_year ;
+	gotoxy(63,2) ;
+	cout <<"Date: " <<d1
+<<"/" <<m1 <<"/" <<y1 ;
+	gotoxy(4,2) ;
+	cout <<"Account no. " <<t_accno ;
+	initial ini ;
+	char t_name[30] ;
+	strcpy(t_name,ini.return_name(t_accno)) ;
+	char t_address[60] ;
+	strcpy(t_address,ini.return_address(t_accno)) ;
+	gotoxy(25,2) ;
+	cout <<t_name ;
+	gotoxy(25,3) ;
+	cout <<t_address ;
+}
+
+
+//**********************************************************
+// THIS FUNCTION DISPLAY RECORD FROM THE FILE BANKING.DAT
+//**********************************************************
+
+void account :: display_account(void)
+{
+	clrscr() ;
+	char t_acc[10] ;
+	int t, t_accno ;
+	gotoxy(1,1) ;
+	cout <<"PRESS (0) TO EXIT" ;
+	gotoxy(5,5) ;
+	cout <<"Enter the account no. " ;
+	gets(t_acc) ;
+	t = atoi(t_acc) ;
+	t_accno = t ;
+	if (t_accno == 0)
+		return ;
+	clrscr() ;
+	initial ini ;
+	if (!ini.found_account(t_accno))
+	{
+		gotoxy(5,5) ;
+		cout <<"\7Account not found" ;
+		getch() ;
+		return ;
+	}
+	box_for_display(t_accno) ;
+	int row=7, flag = 0 ;
+	fstream file ;
+	file.open("BANKING.DAT", ios::in|ios::binary) ;
+	while (file.read((char *) this, sizeof(account)))
+	{
+		if (accno == t_accno)
+		{
+			flag = 0 ;
+			delay(10) ;
+			gotoxy(4,row) ;
+			cout <<dd <<"/"
+<<mm <<"/" <<yy ;
+			gotoxy(16,row) ;
+			cout <<type ;
+			if (tran == 'D')
+				gotoxy(30,row) ;
+			else
+				gotoxy(42,row) ;
+			cout <<long(amount*100)/100.0 ;
+			gotoxy(56,row) ;
+			cout <<long(interest*100)/100.0 ;
+			gotoxy(66,row) ;
+			cout <<long(balance*100)/100.0 ;
+			row++ ;
+			if (row == 23)
+			{
+				flag = 1 ;
+				row = 7 ;
+				gotoxy(4,24) ;
+				cout <<"press a key to continue..." ;
+				getch() ;
+				clrscr() ;
+				box_for_display(t_accno) ;
+			}
+		}
+	}
+	file.close() ;
+	if (!flag)
+	{
+		gotoxy(4,24) ;
+		cout <<"press a key to continue..." ;
+		getch() ;
+	}
+}
+
+
+//**********************************************************
+// THIS FUNCTION RETURNS THE DIFFERENCE BETWEEN 2 DATES.
+//**********************************************************
+
+int account :: no_of_days(int d1, int m1, int y1, int d2, int m2, int
+y2)
+{
+	static int month[] = {31,28,31,30,31,30,31,31,30,31,30,31} ;
+	int days = 0 ;
+	while (d1 != d2 || m1 != m2 || y1 != y2)
+	{
+		days++ ;
+		d1++ ;
+		if (d1 > month[m1-1])
+		{
+			d1 = 1 ;
+			m1++ ;
+		}
+		if (m1 > 12)
+		{
+			m1 = 1 ;
+			y1++ ;
+		}
+	}
+	return days ;
+}
+
+
+//**********************************************************
+// THIS FUNCTION CALCULATES INTEREST.
+//**********************************************************
+
+float account :: calculate_interest(int t_accno, float t_balance)
+{
+	fstream file ;
+	file.open("BANKING.DAT", ios::in|ios::binary) ;
+	file.seekg(0,ios::beg) ;
+	int d1, m1, y1, days ;
+	while (file.read((char *) this, sizeof(account)))
+	{
+		if (accno == t_accno)
+		{
+			d1 = dd ;
+			m1 = mm ;
+			y1 = yy ;
+			break ;
+		}
+	}
+	int d2, m2, y2 ;
+	struct date d;
+	getdate(&d);
+	d2 = d.da_day ;
+	m2 = d.da_mon ;
+	y2 = d.da_year ;
+	float t_interest=0.0 ;
+	if ((y2<y1) || (y2==y1 && m2<m1) || (y2==y1 && m2==m1
+&& d2<d1))
+		return t_interest ;
+	days = no_of_days(d1,m1,y1,d2,m2,y2) ;
+	int months=0 ;
+	if (days >= 30)
+	{
+		months = days/30 ;
+		t_interest = ((t_balance*2)/100) * months ;
+	}
+	file.close() ;
+	return t_interest ;
+}
+
+
+//**********************************************************
+// THIS FUNCTION MAKES TRANSACTIONS (DEPOSIT/WITHDRAW).
+//**********************************************************
+
+void account :: transaction(void)
+{
+	clrscr() ;
+	char t_acc[10] ;
+	int t, t_accno, valid ;
+	gotoxy(1,1) ;
+	cout <<"PRESS (0) TO EXIT" ;
+	gotoxy(5,5) ;
+	cout <<"Enter the account no. " ;
+	gets(t_acc) ;
+	t = atoi(t_acc) ;
+	t_accno = t ;
+	if (t_accno == 0)
+		return ;
+	clrscr() ;
+	initial ini ;
+	if (!ini.found_account(t_accno))
+	{
+		gotoxy(5,5) ;
+		cout <<"\7Account not found" ;
+		getch() ;
+		return ;
+	}
+	shape s ;
+	s.box(2,2,79,24,218) ;
+	s.line_hor(3,78,4,196) ;
+	s.line_hor(3,78,22,196) ;
+	gotoxy(1,1) ;
+	cout <<"PRESS (0) TO EXIT" ;
+	textbackground(WHITE) ;
+	gotoxy(3,3) ;
+	for (int i=1; i<=76; i++) cprintf(" ") ;
+	textbackground(BLACK) ;
+	textcolor(BLACK+BLINK) ; textbackground(WHITE) ;
+	gotoxy(29,3) ;
+	cprintf("TRANSACTION IN ACCOUNT") ;
+	textcolor(LIGHTGRAY) ; textbackground(BLACK) ;
+	int d1, m1, y1 ;
+	struct date d;
+	getdate(&d);
+	d1 = d.da_day ;
+	m1 = d.da_mon ;
+	y1 = d.da_year ;
+	gotoxy(5,6) ;
+	cout <<"Date : "<<d1
+<<"/" <<m1 <<"/" <<y1 ;
+	gotoxy(5,8) ;
+	cout <<"Account no. # " <<t_accno ;
+	char t_name[30] ;
+	char t_address[60] ;
+	float t_balance ;
+	strcpy(t_name,ini.return_name(t_accno)) ;
+	strcpy(t_address,ini.return_address(t_accno)) ;
+	t_balance = ini.give_balance(t_accno) ;
+	s.box(25,10,75,13,218) ;
+	gotoxy(27,11) ;
+	cout <<"Name   : " <<t_name ;
+	gotoxy(27,12) ;
+	cout <<"Address: " <<t_address ;
+	gotoxy(5,15) ;
+	cout <<"Last Balance : Rs." <<t_balance ;
+	char  t_tran, t_type[10], tm[10] ;
+	float t_amount, t_amt ;
+	do
+	{
+		clear(5,18) ;
+		valid = 1 ;
+		gotoxy(5,18) ;
+		cout <<"Deposit or Withdraw (D/W) : " ;
+		t_tran = getche() ;
+		if (t_tran == '0')
+			return ;
+		t_tran = toupper(t_tran) ;
+	} while (t_tran != 'D' && t_tran != 'W') ;
+	do
+	{
+		clear(5,19) ;
+		clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER TRANSACTION BY CASH OR CHEQUE" ;
+		valid = 1 ;
+		gotoxy(5,19) ;
+		cout <<"(Cash/Cheque) : " ;
+		gets(t_type) ;
+		strupr(t_type) ;
+		if (t_type[0] == '0')
+			return ;
+		if (strcmp(t_type,"CASH") &&
+strcmp(t_type,"CHEQUE"))
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7ENTER CORRECTLY                       ") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	do
+	{
+		clear(5,21) ;
+		clear(5,23) ;
+		gotoxy(5,23) ;
+		cout <<"ENTER AMOUNT FOR TRANSACTION" ;
+		valid = 1 ;
+		gotoxy(5,21) ;
+		cout <<"Amount : Rs." ;
+		gets(tm) ;
+		t_amt = atof(tm) ;
+		t_amount = t_amt ;
+		if (tm[0] == '0')
+			return ;
+		if ((t_tran == 'W' && t_amount > t_balance) || (t_amount < 1))
+		{
+			valid = 0 ;
+			gotoxy(5,23) ;
+			cprintf("\7INVALID DATA ENTERED               ") ;
+			getch() ;
+		}
+	} while (!valid) ;
+	char ch ;
+	clear(5,23) ;
+	do
+	{
+		clear(40,20) ;
+		valid = 1 ;
+		gotoxy(40,20) ;
+		cout <<"Save transaction (y/n): " ;
+		ch = getche() ;
+		if (ch == '0')
+			return ;
+		ch = toupper(ch) ;
+	} while (ch != 'N' && ch != 'Y') ;
+	if (ch == 'N')
+		return ;
+	float t_interest ;
+	t_interest = calculate_interest(t_accno,t_balance) ;
+	if (t_tran == 'D')
+		t_balance = t_balance + t_amount + t_interest ;
+	else
+		t_balance = (t_balance - t_amount) + t_interest ;
+	ini.update_balance(t_accno,t_balance) ;
+       
+add_to_file(t_accno,d1,m1,y1,t_tran,t_type,t_interest,t_amount,t_balance)
+ ;
+}
+
+
+//**********************************************************
+// THIS FUNCTION CLOSE THE ACCOUNT (DELETE ACCOUNT).
+//**********************************************************
+
+void account :: close_account(void)
+{
+	clrscr() ;
+	char t_acc[10] ;
+	int t, t_accno ;
+	gotoxy(1,1) ;
+	cout <<"PRESS (0) TO EXIT" ;
+	gotoxy(5,5) ;
+	cout <<"Enter the account no. " ;
+	gets(t_acc) ;
+	t = atoi(t_acc) ;
+	t_accno = t ;
+	if (t_accno == 0)
+		return ;
+	clrscr() ;
+	initial ini ;
+	if (!ini.found_account(t_accno))
+	{
+		gotoxy(5,5) ;
+		cout <<"\7Account not found" ;
+		getch() ;
+		return ;
+	}
+	shape s ;
+	s.box(2,2,79,24,218) ;
+	s.line_hor(3,78,4,196) ;
+	s.line_hor(3,78,22,196) ;
+	gotoxy(1,1) ;
+	cout <<"PRESS (0) TO EXIT" ;
+	textbackground(WHITE) ;
+	gotoxy(3,3) ;
+	for (int i=1; i<=76; i++) cprintf(" ") ;
+	textbackground(BLACK) ;
+	textcolor(BLACK+BLINK) ; textbackground(WHITE) ;
+	gotoxy(30,3) ;
+	cprintf("CLOSE ACCOUNT SCREEN") ;
+	textcolor(LIGHTGRAY) ; textbackground(BLACK) ;
+	int d1, m1, y1 ;
+	struct date d;
+	getdate(&d);
+	d1 = d.da_day ;
+	m1 = d.da_mon ;
+	y1 = d.da_year ;
+	gotoxy(62,5) ;
+	cout <<"Date: "<<d1
+<<"/" <<m1 <<"/" <<y1 ;
+	char ch ;
+	ini.display(t_accno) ;
+	do
+	{
+		clear(5,15) ;
+		gotoxy(5,15) ;
+		cout <<"Close this account (y/n): " ;
+		ch = getche() ;
+		if (ch == '0')
+			return ;
+		ch = toupper(ch) ;
+	} while (ch != 'N' && ch != 'Y') ;
+	if (ch == 'N')
+		return ;
+	ini.delete_account(t_accno) ;
+	delete_account(t_accno) ;
+	gotoxy(5,20) ;
+	cout <<"\7Record Deleted" ;
+	gotoxy(5,23) ;
+	cout <<"press a key to continue..." ;
+	getch() ;
+}
+
+
+//************************************************************
+// THIS IS MAIN FUNCTION CALLING HELP AND MAIN MENU FUNCTIONS
+//************************************************************
+
+void main(void)					//Main segment
+{      int gdriver = DETECT, gmode, errorcode;
+       initgraph(&gdriver, &gmode, "..\\bgi");
+
+
+	gra1();
+	gra2();
+	control c ;
+	c.help() ;
+	c.main_menu() ;
+}
+
+//*************************************************************
+//	   INDIVIDUAL FUNCTION DEFINITIONS
+//*************************************************************
+	void gra1()				//Function definition #1
+	{
+	clrscr();
+	char msg[33];
+	int gdriver=DETECT,gmode,errorcode,c1x,c2x,c3x,c4x,c5x,c6x;
+	int c1y,c2y,c3y,c4y,c5y,c6y;
+	c1x=c2x=270;                    //       c1   c3
+	c3x=c4x=370;                    //   c5           c6
+	c5x=220;c6x=420;                //       c2   c4
+	c1y=c3y=20;
+	c2y=c4y=120;
+	c5y=c6y=70;
+	initgraph (&gdriver, &gmode," c:\\tc");
+	setfillstyle(1,8);
+	setcolor(8);
+	line(0,300,640,300);
+	floodfill(320,240,8);
+	setcolor(4);
+	line(c1x,c1y,c2x,c2y);
+	line(c1x,c1y,c3x,c3y);
+	line(c1x,c1y,c4x,c4y);
+	line(c2x,c2y,c3x,c3y);
+	line(c2x,c2y,c4x,c4y);
+	line(c3x,c3y,c4x,c4y);
+	line(c1x,c1y,c5x,c5y);
+	line(c5x,c5y,c2x,c2y);
+	line(c3x,c3y,c6x,c6y);
+	line(c4x,c4y,c6x,c6y);       		//DRAW THE LOGO OF HSBC
+	setfillstyle(1,4);
+	floodfill(320,72,4);
+	floodfill(320,68,4);
+	floodfill(240,70,4);
+	floodfill(400,70,4);
+	setfillstyle(1,15);
+	floodfill(300,70,4);
+	floodfill(340,70,4);
+	settextjustify(1,1);
+	settextstyle(10,0,7);
+	setcolor(15);
+	outtextxy(230,200,"H");
+	outtextxy(290,200,"S");			//TO WRITE HSBC
+	outtextxy(350,200,"B");
+	outtextxy(410,200,"C");
+
+	setfillstyle(9,7);
+	floodfill(410,250,15);
+	floodfill(225,215,15);
+	floodfill(275,210,15);
+	floodfill(350,215,15);            	//TO FILL THE LETTERS HSBC
+	floodfill(390,210,15);
+	floodfill(423,205,15);
+	floodfill(423,230,15);
+	floodfill(270,244,15);
+	floodfill(300,200,15);
+
+	setcolor(15);
+	line (320-150,320-13,320+150,320-13);
+	line (320-150,320+12,320+150,320+12);
+	line (320-150,320-13,320-150,320+12);
+	line (320+150,320+12,320+150,320-13);
+	int s=30,w;
+	gotoxy(20,23);
+	cout<<"LOADING . . .";
+	for (int
+x1=171,x2=171,y1=308,y2=331,y=1,S=0;x1<470;x1++,x2++,y++,S++)
+		{
+		setcolor(4);
+		line (x1,y1,x2,y2);
+		w=(x1-169)/3;
+		for (int i=34; i<=78; i++)
+		{
+			gotoxy(i,23) ;
+			cout <<" " ;
+		}
+		gotoxy(34,23); cout<<w<<"%";
+		if (x2>270) s=45; if (x2>370) s=10;
+		if (x2==320) delay(999); else
+		delay(s);
+		}
+		delay(800);
+		for (int i=27; i<=78; i++)
+		{
+			gotoxy(i,23) ;
+			cout <<" " ;
+		}
+
+	gotoxy(28,23);
+	cout<<"COMPLETE";  gotoxy(20,25);
+	cout<<"PRESS ANY KEY TO CONTINUE ";
+	getch();
+	cleardevice();
+
+	}
+	void gra2()                             //Function definition *2
+	{
+	clrscr();                               //To make a designer ellipse
+	int gd=DETECT,gm;
+	initgraph(&gd, &gm, "c:\\tc");
+	setcolor(8);
+	ellipse(320,240,0,360,300,150);
+	settextstyle(10,0,4);
+	settextjustify(1,1);
+	setcolor(5);
+	outtextxy(320,170,"PROJECT BANKING");
+	delay(250);
+	settextstyle(4,0,4);
+	setcolor(20);
+	outtextxy(320,220,"Presented By:");
+	delay(250);
+	outtextxy(320,315,"12 - D");
+	settextstyle(10,0,4);
+	setcolor(3);
+	delay(250);
+	outtextxy(320,265,"R U D R A   P R A T A P   S I N G H");
+	for (int stangle=0;!kbhit();stangle++)
+	{
+		setcolor(7);
+		ellipse(320,240,stangle,stangle+20,300,150);
+		ellipse(320,240,stangle+180,stangle+200,300,150);
+		delay(9);
+		setcolor(8);
+		ellipse(320,240,stangle-1,stangle+19,300,150);
+		ellipse(320,240,stangle-1+180,stangle+199,300,150);
+	}
+	closegraph();
+}
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//		 *****   END  OF  THE  PROGRAM   *****
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
