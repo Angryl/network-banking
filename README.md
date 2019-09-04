@@ -23,3 +23,5 @@ step 3. compile the file.</br>
 step 4. run the file.</br>
 VOYLA!!!!
 
+#CONCLUSION
+The aim of our project is to explore new avenues in computing  like the distributed system along with traditional concept  like OOPs and networking.
