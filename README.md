@@ -11,7 +11,7 @@ this is a network banking web-application. In which bank having the full control
 Bank can create, modify, delete the customer account and maintain the accounts statements and the logs.</br>
 and user can withdraw,deposit and transfer the money.</br>
 
-#installation
+# Installation
 software requirement:</br>
   1.IDE</br>
   2.c language compiler</br>
@@ -23,5 +23,6 @@ step 3. compile the file.</br>
 step 4. run the file.</br>
 VOYLA!!!!
 
-#CONCLUSION
+# Conclusion
+
 The aim of our project is to explore new avenues in computing  like the distributed system along with traditional concept  like OOPs and networking.
